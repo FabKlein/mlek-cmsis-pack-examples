@@ -242,10 +242,12 @@ time_t time(time_t* timer)
 
 void _clock_init(void) {}
 
+#if !defined __PERF_COUNTER__
 clock_t clock(void)
 {
     return (clock_t)-1;
 }
+#endif
 
 int remove(const char* arg)
 {

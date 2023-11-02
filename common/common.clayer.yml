@@ -26,12 +26,23 @@ layer:
       files:
         - file: include/BufAttributes.hpp
         - file: include/ethosu_mem_config.h
+        - file: stdout_USART.c
+        - file: retarget_syscalls_clang.c
+           for-compiler: CLANG
 
   # Workaround 4001: for TensorFlow's pack referring to
   # CMSIS_DEVICE_ARM_CORTEX_M_XX_HEADER_FILE.
   # Can be removed once the pack has been fixed.
   misc:
-    - for-compiler: AC6
+    - for-compiler:  AC6
+      CPP:
+        - "-include \"RTE_Components.h\""
+
+    - for-compiler:  CLANG
+      CPP:
+        - "-include \"RTE_Components.h\""
+
+    - for-compiler:  GCC
       CPP:
         - "-include \"RTE_Components.h\""
 
@@ -39,6 +50,7 @@ layer:
     - component: ARM::CMSIS:CORE
     - component: ARM::CMSIS:DSP&Source
     - component: ARM::CMSIS:NN Lib
+    - component: perf_counter:Core
     - component: tensorflow::Data Exchange:Serialization:flatbuffers
     - component: tensorflow::Data Processing:Math:gemmlowp fixed-point
     - component: tensorflow::Data Processing:Math:kissfft
@@ -51,3 +63,8 @@ layer:
     - component: ARM::ML Eval Kit:Common:API
     - component: ARM::ML Eval Kit:Common:Log
     - component: ARM::ML Eval Kit:Common:Math
+
+
+    - component: CMSIS-Compiler:I/O:STDOUT&User
+    - component: ARM::Device:Native Driver:UART
+    - component: ARM::CMSIS Driver:USART

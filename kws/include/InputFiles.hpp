@@ -24,7 +24,7 @@
 
 #define NUMBER_OF_FILES (1U)
 
-extern const int16_t audio0[16000];
+extern const int16_t audio0[64000];
 
 const char* get_filename(const uint32_t idx);
 const int16_t* get_audio_array(const uint32_t idx);

@@ -75,11 +75,11 @@ project:
 
     - group: Device Files
       files:
-        - file: linker/mps3-sse-300.sct
-          for-context:
-            - +AVH-SSE-300
-            - +AVH-SSE-300-U55
-            - +AVH-SSE-300-U65
+        #- file: linker/mps3-sse-300.sct
+        #  for-context:
+        #    - +AVH-SSE-300
+        #    - +AVH-SSE-300-U55
+        #    - +AVH-SSE-300-U65
         - file: linker/mps3-sse-310.sct
           for-context:
             - +AVH-SSE-310
@@ -117,6 +117,37 @@ project:
     - layer: ../device/alif-ensemble/alif-ensemble-E7-device.clayer.yml
       for-context:
         - +Alif-E7-M55-HE
+
+  linker:
+    - script: linker/C300/ac6_sse300_mps3_s.sct
+      for-context:
+            - +AVH-SSE-300
+            - +AVH-SSE-300-U55
+            - +AVH-SSE-300-U65
+      for-compiler: AC6
+
+    - script: linker/C300/clang_sse300_mps3.sct
+      for-context:
+            - +AVH-SSE-300
+            - +AVH-SSE-300-U55
+            - +AVH-SSE-300-U65
+      for-compiler: CLANG
+
+    - script: linker/C300/gcc_sse300_mps3.ld
+      for-context:
+            - +AVH-SSE-300
+            - +AVH-SSE-300-U55
+            - +AVH-SSE-300-U65
+      for-compiler: GCC
+
+
+    - regions: linker/C300/region_defs.h
+      for-context:
+            - +AVH-SSE-300
+            - +AVH-SSE-300-U55
+            - +AVH-SSE-300-U65
+
+
 
   components:
     - component: ARM::ML Eval Kit:Voice:Keyword spotting

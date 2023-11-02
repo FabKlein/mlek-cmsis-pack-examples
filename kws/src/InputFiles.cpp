@@ -27,7 +27,7 @@ static const int16_t* audio_clip_arrays[] = {
 };
 
 static const size_t audio_clip_sizes[NUMBER_OF_FILES] = {
-    16000,
+    64000,
 };
 
 const char* get_filename(const uint32_t idx)

@@ -132,9 +132,43 @@ static int arm_ethosu_npu_init(void)
 }
 #endif // defined(__cplusplus)
 
+
+#ifdef RTE_Compiler_IO_STDOUT_User
+extern "C" {
+ void stdout_init(void);
+}
+#endif
+
+#if defined __PERF_COUNTER__
+extern "C" {
+    #include "perf_counter.h"
+
+    void init_cycle_counter(bool );
+	void SystemCoreClockUpdate(void);
+    __attribute__((used)) void SysTick_Handler(void)
+    {
+        #if (defined(__IS_COMPILER_LLVM__) && __IS_COMPILER_LLVM__)
+        user_code_insert_to_systick_handler();
+        #endif
+    }
+}
+#endif
+
 void BoardInit(void)
 {
-    UartStdOutInit();
+
+#ifdef RTE_Compiler_IO_STDOUT_User
+   stdout_init();
+#endif
+
+#if defined __PERF_COUNTER__
+    SystemCoreClockUpdate();
+    init_cycle_counter(false);
+#endif
+
+    /* Enable I and D-Cache */
+    SCB_EnableICache();
+    SCB_EnableDCache();
 
 #if defined(ETHOSU_ARCH)
     /* Initialise the NPU */

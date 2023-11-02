@@ -40,6 +40,10 @@
 #include "BoardInit.hpp"      /* Board initialisation */
 #include "log_macros.h"      /* Logging macros (optional) */
 
+#if defined __PERF_COUNTER__
+#include "perf_counter.h"
+#endif
+
 namespace arm {
 namespace app {
     /* Tensor arena buffer */
@@ -133,6 +137,12 @@ int main()
     debug("Using audio data from %s\n", get_filename(0));
 
     while (audioDataSlider.HasNext()) {
+
+#if defined __PERF_COUNTER__
+        uint64_t infCyc  = (uint64_t)get_system_ticks();
+#endif
+        __asm("DBG #9");
+
         const int16_t* inferenceWindow = audioDataSlider.Next();
 
         /* The first window does not have cache ready. */
@@ -164,6 +174,13 @@ int main()
             audioDataSlider.Index() * secondsPerSample * preProcess.m_audioDataStride,
             audioDataSlider.Index(),
             scoreThreshold));
+
+#if defined __PERF_COUNTER__
+        __asm("DBG #1");
+	infCyc = get_system_ticks() - infCyc;
+        info("infCyc: %lld\n",infCyc);
+#endif
+
     } /* while (audioDataSlider.HasNext()) */
 
     for (const auto& result : finalResults) {
