@@ -26,6 +26,7 @@ project:
     - group: Wav file based example
       for-context:
         - +AVH-SSE-300
+        - +MPS3-SSE-300
         - +AVH-SSE-310
         - +AVH-SSE-300-U65
         - +AVH-SSE-310-U65
@@ -70,6 +71,7 @@ project:
           for-context:
             - +FRDM-K64F
             - +STM32F746-DISCO
+            - +MPS3-SSE-300
             - +AVH-SSE-300
             - +AVH-SSE-310
 
@@ -100,6 +102,7 @@ project:
     - layer: ../device/corstone/corstone-device.clayer.yml
       for-context:
         - +AVH-SSE-300
+        - +MPS3-SSE-300
         - +AVH-SSE-300-U55
         - +AVH-SSE-300-U65
         - +AVH-SSE-310
@@ -122,21 +125,35 @@ project:
     - script: linker/C300/ac6_sse300_mps3_s.sct
       for-context:
             - +AVH-SSE-300
+            - +MPS3-SSE-300
             - +AVH-SSE-300-U55
             - +AVH-SSE-300-U65
       for-compiler: AC6
 
+      for-context:   +AVH-SSE-300
+      define:                    # with define setting
+        __FVP__: 1               # define with value
+
+
     - script: linker/C300/clang_sse300_mps3.sct
       for-context:
             - +AVH-SSE-300
+            - +MPS3-SSE-300
             - +AVH-SSE-300-U55
             - +AVH-SSE-300-U65
       for-compiler: CLANG
+
+      for-context:   +AVH-SSE-300
+      define:                    # with define setting
+       - __FVP__: 1               # define with value
+
+
 
     - script: linker/C300/gcc_sse300_mps3.ld
       for-context:
             - +AVH-SSE-300
             - +AVH-SSE-300-U55
+            - +MPS3-SSE-300
             - +AVH-SSE-300-U65
       for-compiler: GCC
 
@@ -144,10 +161,16 @@ project:
     - regions: linker/C300/region_defs.h
       for-context:
             - +AVH-SSE-300
+            - +MPS3-SSE-300
             - +AVH-SSE-300-U55
             - +AVH-SSE-300-U65
 
 
+  misc:
+    - for-compiler: CLANG
+      Link:
+  #      - -lcrt0-semihost
+  #      - -lsemihost
 
   components:
     - component: ARM::ML Eval Kit:Voice:Keyword spotting

@@ -46,8 +46,11 @@
 #define ITCM_SIZE 0x00080000
 #define DTCM_BASE 0x20000000
 #define DTCM_SIZE 0x00080000
-/*#define DDR_BASE  0x70000000 */
+#if defined (__FVP__) && (__FVP__ == 1)
 #define DDR_BASE  0x31000000
+#else
+#define DDR_BASE  0x70000000
+#endif
 #define DDR_SIZE  0x10000000
 
 #define STACK_SIZE 0x8000

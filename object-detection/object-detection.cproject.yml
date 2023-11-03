@@ -31,6 +31,7 @@ project:
         - file: src/yolo-fastest_192_face_v4.tflite.cpp
           for-context:
             - +AVH-SSE-300
+            - +MPS3-SSE-300
             - +AVH-SSE-310
         - file: src/yolo-fastest_192_face_v4_vela_H256.tflite.cpp
           for-context:
@@ -44,6 +45,7 @@ project:
         - file: src/main_static.cpp
           for-context:
             - +AVH-SSE-300
+            - +MPS3-SSE-300
             - +AVH-SSE-300-U55
             - +AVH-SSE-300-U65
             - +AVH-SSE-310
@@ -58,6 +60,7 @@ project:
         - file: linker/mps3-sse-300.sct
           for-context:
             - +AVH-SSE-300
+            - +MPS3-SSE-300
             - +AVH-SSE-300-U55
             - +AVH-SSE-300-U65
         - file: linker/mps3-sse-310.sct
@@ -78,6 +81,7 @@ project:
     - layer: ../device/corstone/corstone-device.clayer.yml
       for-context:
         - +AVH-SSE-300
+        - +MPS3-SSE-300
         - +AVH-SSE-300-U55
         - +AVH-SSE-300-U65
         - +AVH-SSE-310
@@ -88,5 +92,56 @@ project:
       for-context:
         - +Alif-E7-M55-HP
 
+  linker:
+    - script: linker/mps3-sse-300.sct
+    #linker/C300/ac6_sse300_mps3_s.sct
+      for-context:
+            - +AVH-SSE-300
+            - +MPS3-SSE-300
+            - +AVH-SSE-300-U55
+            - +AVH-SSE-300-U65
+      for-compiler: AC6
+
+      for-context:   +AVH-SSE-300
+      define:                    # with define setting
+        __FVP__: 1               # define with value
+
+
+    - script: linker/C300/clang_sse300_mps3.sct
+      for-context:
+            - +AVH-SSE-300
+            - +MPS3-SSE-300
+            - +AVH-SSE-300-U55
+            - +AVH-SSE-300-U65
+      for-compiler: CLANG
+
+      for-context:   +AVH-SSE-300
+      define:                    # with define setting
+       - __FVP__: 1               # define with value
+
+
+
+    - script: linker/C300/gcc_sse300_mps3.ld
+      for-context:
+            - +AVH-SSE-300
+            - +AVH-SSE-300-U55
+            - +MPS3-SSE-300
+            - +AVH-SSE-300-U65
+      for-compiler: GCC
+
+
+    - regions: linker/C300/region_defs.h
+      for-context:
+            - +AVH-SSE-300
+            - +MPS3-SSE-300
+            - +AVH-SSE-300-U55
+            - +AVH-SSE-300-U65
+
+
+  misc:
+    - for-compiler: CLANG
+      Link:
+  #      - -lcrt0-semihost
+  #      - -lsemihost
   components:
     - component: ARM::ML Eval Kit:Vision:Object detection

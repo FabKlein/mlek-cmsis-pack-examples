@@ -45,17 +45,21 @@ solution:
 
   build-types:
     - type: Debug
-      compiler: AC6
       debug: on
       optimize: none
 
     - type: Release
-      compiler: AC6
       debug: off
       optimize: speed
 
+
+
+
   target-types:
     - type: AVH-SSE-300
+      device: ARM::SSE-300-MPS3
+
+    - type: MPS3-SSE-300
       device: ARM::SSE-300-MPS3
 
     - type: AVH-SSE-300-U55
@@ -64,10 +68,16 @@ solution:
         - ETHOSU55
 
     - type: AVH-SSE-310
-      device: ARM::SSE-310-MPS3
+      device: SSE-310-MPS3_FVP
+      define:
+        - FVP
+    - type: MPS3-SSE-310
+      device: SSE-310-MPS3_AN555
+      define:
+        - FPGA
 
     - type: AVH-SSE-310-U55
-      device: ARM::SSE-310-MPS3
+      device: SSE-310-MPS3_FVP
       define:
         - ETHOSU55
 
@@ -111,6 +121,7 @@ solution:
         - +AVH-SSE-300-U55
         - +AVH-SSE-310-U55
         - +AVH-SSE-300
+        - +MPS3-SSE-300
         - +AVH-SSE-310
         - +Alif-E7-M55-HP
     - project: ./kws/kws.cproject.yml
@@ -120,7 +131,13 @@ solution:
         - +AVH-SSE-300-U55
         - +AVH-SSE-310-U55
         - +AVH-SSE-300
+        - +MPS3-SSE-300
         - +AVH-SSE-310
         - +FRDM-K64F
         - +STM32F746-DISCO
         - +Alif-E7-M55-HE
+
+  output-dirs:
+    cprjdir: ./$Project$.$BuildType$+$TargetType$-$Compiler$
+    intdir: ./$Project$.$BuildType$+$TargetType$-$Compiler$/intdir
+    outdir: ./$Project$.$BuildType$+$TargetType$-$Compiler$/outdir

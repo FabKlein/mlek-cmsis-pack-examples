@@ -38,6 +38,10 @@
 #include "BoardInit.hpp"      /* Board initialisation */
 #include "log_macros.h"      /* Logging macros (optional) */
 
+#if defined __PERF_COUNTER__
+#include "perf_counter.h"
+#endif
+
 namespace arm {
 namespace app {
     /* Tensor arena buffer */
@@ -106,31 +110,43 @@ int main()
     /* Strings for presentation/logging. */
     std::string str_inf{"Running inference... "};
 
-    const uint8_t* currImage = get_img_array(0);
+    for(int i=0;i<2;i++) {
 
-    auto dstPtr = static_cast<uint8_t*>(inputTensor->data.uint8);
-    const size_t copySz =
-        inputTensor->bytes < IMAGE_DATA_SIZE ? inputTensor->bytes : IMAGE_DATA_SIZE;
+#if defined __PERF_COUNTER__
+        uint64_t infCyc  = (uint64_t)get_system_ticks();
+#endif
+        __asm("DBG #9");
 
-    /* Run the pre-processing, inference and post-processing. */
-    if (!preProcess.DoPreProcess(currImage, copySz)) {
-        printf_err("Pre-processing failed.");
-        return 1;
+        const uint8_t* currImage = get_img_array(0);
+
+        auto dstPtr = static_cast<uint8_t*>(inputTensor->data.uint8);
+        const size_t copySz =
+            inputTensor->bytes < IMAGE_DATA_SIZE ? inputTensor->bytes : IMAGE_DATA_SIZE;
+
+        /* Run the pre-processing, inference and post-processing. */
+        if (!preProcess.DoPreProcess(currImage, copySz)) {
+            printf_err("Pre-processing failed.");
+            return 1;
+        }
+
+        /* Run inference over this image. */
+        info("Running inference on image %" PRIu32 " => %s\n", 0, get_filename(0));
+
+        if (!model.RunInference()) {
+            printf_err("Inference failed.");
+            return 2;
+        }
+
+        if (!postProcess.DoPostProcess()) {
+            printf_err("Post-processing failed.");
+            return 3;
+        }
+        __asm("DBG #1");
+#if defined __PERF_COUNTER__
+	    infCyc = get_system_ticks() - infCyc;
+        info("infCyc: %lld\n",infCyc);
+#endif
     }
-
-    /* Run inference over this image. */
-    info("Running inference on image %" PRIu32 " => %s\n", 0, get_filename(0));
-
-    if (!model.RunInference()) {
-        printf_err("Inference failed.");
-        return 2;
-    }
-
-    if (!postProcess.DoPostProcess()) {
-        printf_err("Post-processing failed.");
-        return 3;
-    }
-
     /* Log the results. */
     for (uint32_t i = 0; i < results.size(); ++i) {
         info("Detection at index %" PRIu32 ", at x-coordinate %" PRIu32 ", y-coordinate %" PRIu32

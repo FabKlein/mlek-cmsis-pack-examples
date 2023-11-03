@@ -27,8 +27,13 @@ layer:
         - file: include/BufAttributes.hpp
         - file: include/ethosu_mem_config.h
         - file: stdout_USART.c
+          for-context:
+            - +MPS3-SSE-300
         - file: retarget_syscalls_clang.c
-           for-compiler: CLANG
+          for-compiler: CLANG
+          for-context:
+            - +MPS3-SSE-300
+
 
   # Workaround 4001: for TensorFlow's pack referring to
   # CMSIS_DEVICE_ARM_CORTEX_M_XX_HEADER_FILE.
@@ -66,5 +71,13 @@ layer:
 
 
     - component: CMSIS-Compiler:I/O:STDOUT&User
+      for-context:
+        - +MPS3-SSE-300
+
     - component: ARM::Device:Native Driver:UART
+      for-context:
+        - +MPS3-SSE-300
+
     - component: ARM::CMSIS Driver:USART
+      for-context:
+        - +MPS3-SSE-300
