@@ -92,7 +92,6 @@ PHDRS
 	text PT_LOAD;
 	ram PT_LOAD;
 	ram_init PT_LOAD;
-	isram PT_LOAD;
 	ddr PT_LOAD;
 	tls PT_TLS;
 }
@@ -182,43 +181,6 @@ SECTIONS
 	} >ITCM AT>ITCM :text
 
 
-  .copy.table :
-  {
-    . = ALIGN(4);
-    __copy_table_start__ = .;
-
-    LONG (LOADADDR(.data))
-    LONG (ADDR(.data))
-    LONG (SIZEOF(.data) / 4)
-
-    /* Add each additional data section here */
-/*
-    LONG (LOADADDR(.data2))
-    LONG (ADDR(.data2))
-    LONG (SIZEOF(.data2) / 4)
-*/
-    __copy_table_end__ = .;
-  } > ITCM
-
-
-  .zero.table :
-  {
-    . = ALIGN(4);
-    __zero_table_start__ = .;
-
-/*  .bss initialization to zero is already done during C Run-Time Startup.
-    LONG (ADDR(.bss))
-    LONG (SIZEOF(.bss) / 4)
-*/
-
-    /* Add each additional bss section here */
-/*
-    LONG (ADDR(.bss2))
-    LONG (SIZEOF(.bss2) / 4)
-*/
-    __zero_table_end__ = .;
-  } > ITCM
-
 	/*
 	 * Data values which are preserved across reset
 	 */
@@ -228,16 +190,6 @@ SECTIONS
 		KEEP(*(.preserve))
 		PROVIDE(__preserve_end__ = .);
 	} >DTCM AT>DTCM :ram
-
-    .isram (NOLOAD):     {
-        /* Cache area (if used) */
-        * (.bss.NoInit.ethos_u_cache)
-
-        /* activation buffers a.k.a tensor arena when */
-        /* memory mode sram only or shared sram */
-        *(.bss.NoInit.activation_buf_sram)
-    } > ISRAM : isram
-
 
 	.data :  {
 		*(.data .data.*)
@@ -311,9 +263,18 @@ SECTIONS
 	} >DTCM AT>DTCM :ram
 	*/
 
+
+
+    .isram (NOLOAD):     {
+        ; Cache area (if used)
+        * (.bss.NoInit.ethos_u_cache)
+
+        ; activation buffers a.k.a tensor arena when
+        ; memory mode sram only or shared sram
+        *(.bss.NoInit.activation_buf_sram)
+    } > ISRAM : ddr
+
 	.bss (NOLOAD) : {
-    . = ALIGN(4);
-    __bss_start__ = .;
 		*(.sbss*)
 		*(.gnu.linkonce.sb.*)
 		*(.bss .bss.*)
@@ -323,8 +284,6 @@ SECTIONS
 		/* Align the heap */
 		. = ALIGN(8);
 		__bss_end = .;
-    __bss_end__ = .;
-
 	} >DTCM AT>DTCM :ram
 	PROVIDE( __non_tls_bss_start = ADDR(.bss) );
 	PROVIDE( __end = __bss_end );
@@ -336,13 +295,11 @@ SECTIONS
 	PROVIDE (__heap_start = __end);
 #ifdef HEAP_SIZE
 	PROVIDE (__heap_end = __heap_start + HEAP_SIZE);
-
+	PROVIDE (HEAP_SIZE = HEAP_SIZE);
 #else
 	PROVIDE (__heap_end = __stack - STACK_SIZE);
 	PROVIDE (HEAP_SIZE = __heap_end - __heap_start);
 #endif
-PROVIDE (__HeapLimit = __heap_end);
-
 	.heap (NOLOAD) : {
 		. += HEAP_SIZE;
 	} >DTCM :ram
@@ -350,9 +307,6 @@ PROVIDE (__HeapLimit = __heap_end);
 	/* Define a stack region to make sure it fits in memory */
 	PROVIDE(__stack = ORIGIN(DTCM) + LENGTH(DTCM) - __STACKSEAL_SIZE);
 	PROVIDE(__stack_limit = __stack - STACK_SIZE);
-
-  PROVIDE(__StackTop = __stack);
-  PROVIDE(__StackLimit = __stack_limit);
 	.stack (__stack_limit) (NOLOAD) : {
 		. += STACK_SIZE;
 	} >DTCM :ram
@@ -377,6 +331,7 @@ PROVIDE (__HeapLimit = __heap_end);
 	}
 
 	*/
+
 
 
     .ddr : {

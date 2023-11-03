@@ -120,9 +120,7 @@ SECTIONS
 		PROVIDE (_etext = __text_end);
 		PROVIDE (etext = __text_end);
 
-		/* read-only data */
-		*(.rdata)
-		*(.rodata .rodata.*)
+
 		*(.gnu.linkonce.r.*)
 
 		*(.srodata.cst16)
@@ -243,6 +241,9 @@ SECTIONS
 		*(.data .data.*)
 		*(.gnu.linkonce.d.*)
 
+		/* read-only data */
+		*(.rdata)
+		*(.rodata .rodata.*)
 		/* Need to pre-align so that the symbols come after padding */
 		. = ALIGN(8);
 

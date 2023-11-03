@@ -52,7 +52,7 @@ default:
         - -flax-vector-conversions
 
       CPP:
-        - -std=c++14
+        - -std=gnu++14
         - -fno-exceptions
         - -fno-rtti
 
@@ -63,7 +63,7 @@ default:
         - -fdata-sections
 
       Link:
-        - --specs=nano.specs
+        #- --specs=nano.specs
         #- --specs=rdimon.specs
         - --specs=nosys.specs
         - -Wl,-Map=$elf()$.map

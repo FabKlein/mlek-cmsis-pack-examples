@@ -147,7 +147,7 @@ extern "C" {
 	void SystemCoreClockUpdate(void);
     __attribute__((used)) void SysTick_Handler(void)
     {
-        #if (defined(__IS_COMPILER_LLVM__) && __IS_COMPILER_LLVM__)
+        #if defined(__IS_COMPILER_GCC__) || defined(__IS_COMPILER_LLVM__)
         user_code_insert_to_systick_handler();
         #endif
     }
